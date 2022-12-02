@@ -20,13 +20,14 @@ package app
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/edgexfoundry/app-functions-sdk-go/v2/internal/common"
 	"github.com/edgexfoundry/app-functions-sdk-go/v2/internal/runtime"
 	"github.com/edgexfoundry/app-functions-sdk-go/v2/internal/trigger/http"
 	"github.com/edgexfoundry/app-functions-sdk-go/v2/internal/trigger/messagebus"
 	"github.com/edgexfoundry/app-functions-sdk-go/v2/internal/trigger/mqtt"
 	"github.com/edgexfoundry/app-functions-sdk-go/v2/pkg/interfaces"
-	"strings"
 )
 
 const (
@@ -66,6 +67,10 @@ func (svc *Service) setupTrigger(configuration *common.ConfigurationStruct, runt
 	}
 
 	return t
+}
+
+func (svc *Service) GetDefaultTrigger() interfaces.Trigger {
+	return svc.defaultTrigger
 }
 
 // RegisterCustomTriggerFactory allows users to register builders for custom trigger types

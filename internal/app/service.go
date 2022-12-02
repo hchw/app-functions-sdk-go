@@ -88,6 +88,7 @@ type Service struct {
 	commandLine               commandLineFlags
 	flags                     *flags.Default
 	configProcessor           *config.Processor
+	defaultTrigger            interfaces.Trigger
 }
 
 type commandLineFlags struct {
@@ -160,13 +161,13 @@ func (svc *Service) MakeItRun() error {
 	svc.ctx.stop = stop
 
 	// determine input type and create trigger for it
-	t := svc.setupTrigger(svc.config, svc.runtime)
-	if t == nil {
+	svc.defaultTrigger = svc.setupTrigger(svc.config, svc.runtime)
+	if svc.defaultTrigger == nil {
 		return errors.New("failed to create Trigger")
 	}
 
 	// Initialize the trigger (i.e. start a web server, or connect to message bus)
-	deferred, err := t.Initialize(svc.ctx.appWg, svc.ctx.appCtx, svc.backgroundPublishChannel)
+	deferred, err := svc.defaultTrigger.Initialize(svc.ctx.appWg, svc.ctx.appCtx, svc.backgroundPublishChannel)
 	if err != nil {
 		svc.lc.Error(err.Error())
 		return errors.New("failed to initialize Trigger")

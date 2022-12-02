@@ -136,6 +136,10 @@ func (trigger *Trigger) Initialize(_ *sync.WaitGroup, _ context.Context, backgro
 	return deferred, nil
 }
 
+func (trigger *Trigger) GetClient() (mqttClient pahoMqtt.Client) {
+	return trigger.mqttClient
+}
+
 func (trigger *Trigger) onConnectHandler(mqttClient pahoMqtt.Client) {
 	// Convenience short cuts
 	lc := trigger.lc
