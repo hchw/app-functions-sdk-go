@@ -18,7 +18,6 @@ package mqtt
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -64,7 +63,7 @@ func NewTrigger(dic *di.Container, runtime *runtime.GolangRuntime) *Trigger {
 }
 
 // Initialize initializes the Trigger for an external MQTT broker
-func (trigger *Trigger) Initialize(_ *sync.WaitGroup, _ context.Context, background <-chan interfaces.BackgroundMessage) (bootstrap.Deferred, error) {
+func (trigger *Trigger) Initialize(_ *sync.WaitGroup, ctx context.Context, background <-chan interfaces.BackgroundMessage) (bootstrap.Deferred, error) {
 	// Convenience short cuts
 	lc := trigger.lc
 	config := container.ConfigurationFrom(trigger.dic.Get)
@@ -76,10 +75,6 @@ func (trigger *Trigger) Initialize(_ *sync.WaitGroup, _ context.Context, backgro
 	trigger.publishTopic = config.Trigger.ExternalMqtt.PublishTopic
 
 	lc.Info("Initializing MQTT Trigger")
-
-	if background != nil {
-		return nil, errors.New("background publishing not supported for services using MQTT trigger")
-	}
 
 	if len(strings.TrimSpace(topics)) == 0 {
 		return nil, fmt.Errorf("missing SubscribeTopics for MQTT Trigger. Must be present in [Trigger.ExternalMqtt] section")
@@ -133,7 +128,25 @@ func (trigger *Trigger) Initialize(_ *sync.WaitGroup, _ context.Context, backgro
 
 	trigger.mqttClient = mqttClient
 
+	if background != nil {
+		go trigger.dealBackGroundMessage(ctx, background)
+	}
 	return deferred, nil
+}
+
+func (trigger *Trigger) dealBackGroundMessage(ctx context.Context, background <-chan interfaces.BackgroundMessage) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-background:
+			topic := msg.Topic()
+			payload := msg.Message().Payload
+			trigger.lc.Infof("deal BackGroundMessage topic: %s payload%s", topic, payload)
+			token := trigger.mqttClient.Publish(topic, trigger.qos, false, payload)
+			token.WaitTimeout(time.Duration(time.Second * 5))
+		}
+	}
 }
 
 func (trigger *Trigger) onConnectHandler(mqttClient pahoMqtt.Client) {
