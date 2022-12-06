@@ -136,7 +136,7 @@ func (trigger *Trigger) Initialize(_ *sync.WaitGroup, _ context.Context, backgro
 	return deferred, nil
 }
 
-func (trigger *Trigger) GetClient() (mqttClient pahoMqtt.Client) {
+func (trigger *Trigger) GetClient() (mqttClient interface{}) {
 	return trigger.mqttClient
 }
 

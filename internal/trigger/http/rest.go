@@ -122,3 +122,7 @@ func (trigger *Trigger) requestHandler(writer http.ResponseWriter, r *http.Reque
 
 	trigger.outputData = nil
 }
+
+func (trigger *Trigger) GetClient() interface{} {
+	return trigger.Webserver
+}

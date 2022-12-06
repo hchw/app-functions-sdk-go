@@ -44,6 +44,8 @@ type TriggerConfig struct {
 type Trigger interface {
 	// Initialize performs post creation initializations
 	Initialize(wg *sync.WaitGroup, ctx context.Context, background <-chan BackgroundMessage) (bootstrap.Deferred, error)
+
+	GetClient() interface{}
 }
 
 // TriggerMessageProcessor provides an interface that can be used by custom triggers to invoke the runtime

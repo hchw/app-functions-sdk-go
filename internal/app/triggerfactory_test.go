@@ -155,6 +155,9 @@ type mockCustomTrigger struct {
 func (*mockCustomTrigger) Initialize(_ *sync.WaitGroup, _ context.Context, _ <-chan interfaces.BackgroundMessage) (bootstrap.Deferred, error) {
 	return nil, nil
 }
+func (*mockCustomTrigger) GetClient() interface{} {
+	return nil
+}
 
 func Test_Service_setupTrigger_CustomType(t *testing.T) {
 	triggerName := uuid.New().String()

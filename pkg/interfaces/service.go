@@ -173,3 +173,8 @@ type ApplicationService interface {
 	// BuildContext allows external callers that may need a context (eg background publishers) to easily create one
 	BuildContext(correlationId string, contentType string) AppFunctionContext
 }
+
+type ApplicationServiceV2 interface {
+	ApplicationService
+	GetDefaultTrigger() Trigger
+}

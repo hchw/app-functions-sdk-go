@@ -304,3 +304,7 @@ func (trigger *Trigger) setOptionalAuthData(messageBusConfig *types.MessageBusCo
 
 	return nil
 }
+
+func (trigger *Trigger) GetClient() interface{} {
+	return trigger.client
+}
